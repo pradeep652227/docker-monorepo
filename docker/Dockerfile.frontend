@@ -1,0 +1,37 @@
+FROM oven/bun:1
+RUN apt-get update && apt-get install -y postgresql-client
+# Set working directory
+WORKDIR /app
+
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Accept build-time database URL
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
+# Copy root monorepo files
+COPY ./package.json ./package-lock.json ./bun.lock ./turbo.json ./
+
+# Copy the frontend app
+COPY ./apps/web ./apps/web
+
+# Optional: Copy shared packages if needed
+COPY ./packages ./packages
+
+# Install all dependencies
+RUN bun install
+
+
+# Generate DB client (if required)
+RUN bun run db:generate
+
+#Build the project docker build
+RUN bun run build:frontend
+
+# Expose frontend port
+EXPOSE 3000
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Start frontend server via root script
+CMD ["bun", "run", "start:frontend"]
