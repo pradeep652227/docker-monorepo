@@ -1,24 +1,25 @@
-name: Deploy Backend
+name: Continuous Deployment (Prod) (Backend)
 on:
   push:
-    branches: [main]
-
+    branches: [ main ]
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps: 
-          - uses: actions/checkout@v2
-            with :
-              fetch-depth: 0
-          - name: Docker login
-            uses: docker/login-action@v2
-            with:
-                username: ${{ secrets.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
-          - name: Docker build and push
-            uses: docker/build-push-action@v2
-            with :
-             context: .
-             file: ./docker/Dockerfile.backend
-             push: true
-             tags: monorepo-docker-backend:${{github.sha}}
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./docker/Dockerfile.backend
+          push: true
+          tags: docker-monorepo-backend:${{ github.sha }}
