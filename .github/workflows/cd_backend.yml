@@ -49,10 +49,10 @@ jobs:
             fi
 
             # Pull and deploy the Docker image
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-docker-backend:${{ github.TEST_DOCKER_TAG }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-docker-backend:${{ secrets.TEST_DOCKER_TAG }}
             docker stop monorepo-backend || true
             docker rm monorepo-backend || true
             docker run -d --name monorepo-backend \
               -p 8000:8000 \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-              ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-docker-backend:${{ github.TEST_DOCKER_TAG }}
+              ${{ secrets.DOCKERHUB_USERNAME }}/monorepo-docker-backend:${{ secrets.TEST_DOCKER_TAG }}
